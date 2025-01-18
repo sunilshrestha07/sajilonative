@@ -1,0 +1,13 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/JimNightshade-Regular.ttf",
+      "sha1": "3d09892f57603b3cc942bcf625be51685e6f330e"
+    },
+    {
+      "path": "assets/fonts/Quicksand-VariableFont_wght.ttf",
+      "sha1": "17fb514f853cfeb7176a384fa29358e9c4b76c39"
+    }
+  ]
+}
