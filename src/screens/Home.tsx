@@ -267,7 +267,11 @@ export default function Home({navigation}: any) {
 
   //handel find driver click event
   const handelFindDriver = () => {
-    dispatch(setIsSearchingForDriver());
+    if (pickUplocationstate && dropLocationstate) {
+      dispatch(setIsSearchingForDriver());
+    } else {
+      Alert.alert('Please select pickup and drop location');
+    }
   };
 
   return (
@@ -280,113 +284,128 @@ export default function Home({navigation}: any) {
         <View style={[tw` z-0`]}>
           <Map navigation={navigation} />
         </View>
-
-        {/* //if the ride has been confirmed then dont show the location input and driver options */}
-        {isRideBooked ? (
-          <View >
-            <RideComfirmed />
-          </View>
-        ) : (
-          // if the ride has been confirmed then dont show the location input and driver options
-          <View
-            style={[
-              tw`w-100% h-100% pt-4 rounded-t-3xl px-2 border-[1px] border-black`,
-            ]}>
+        <View>
+          {currentUser?.role === 'user' ? (
             <View>
-              <View style={[tw`h-28 w-100% flex flex-row gap-1`]}>
-                {options.map((option, index) => (
-                  <View
-                    style={[
-                      tw`w-24.5% aspect-video border-[1px] border-black rounded-2xl ${
-                        vechicelType?.name === option.name ? 'bg-gray-500' : ''
-                      } `,
-                    ]}
-                    key={index}>
-                    <View style={tw`w-full h-full items-center justify-center`}>
-                      <TouchableNativeFeedback
-                        onPress={() => selectVehicleType(option)}>
-                        <Image
+              {isRideBooked ? (
+                <View>
+                  <RideComfirmed />
+                </View>
+              ) : (
+                // if the ride has been confirmed then dont show the location input and driver options
+                <View
+                  style={[
+                    tw`w-100% h-100% pt-4 rounded-t-3xl px-2 border-[1px] border-black`,
+                  ]}>
+                  <View>
+                    <View style={[tw`h-28 w-100% flex flex-row gap-1`]}>
+                      {options.map((option, index) => (
+                        <View
                           style={[
-                            tw`py-2 ${
-                              option.name === 'Delivery' ||
-                              option.name === 'Bike'
-                                ? 'h-16 w-16'
-                                : 'h-20 w-20'
+                            tw`w-24.5% aspect-video border-[1px] border-black rounded-2xl ${
+                              vechicelType?.name === option.name
+                                ? 'bg-gray-500'
+                                : ''
                             } `,
                           ]}
-                          source={option.image}
-                        />
-                      </TouchableNativeFeedback>
+                          key={index}>
+                          <View
+                            style={tw`w-full h-full items-center justify-center`}>
+                            <TouchableNativeFeedback
+                              onPress={() => selectVehicleType(option)}>
+                              <Image
+                                style={[
+                                  tw`py-2 ${
+                                    option.name === 'Delivery' ||
+                                    option.name === 'Bike'
+                                      ? 'h-16 w-16'
+                                      : 'h-20 w-20'
+                                  } `,
+                                ]}
+                                source={option.image}
+                              />
+                            </TouchableNativeFeedback>
+                          </View>
+                          <Text style={[tw`text-center`]}>{option.name}</Text>
+                        </View>
+                      ))}
                     </View>
-                    <Text style={[tw`text-center`]}>{option.name}</Text>
+
+                    {/* //location input */}
+                    <View
+                      style={[
+                        tw`flex flex-col gap-3 -mt-4 ${
+                          locationInputIsActive ? ' hidden' : ''
+                        }`,
+                      ]}>
+                      <View>
+                        <TextInput
+                          // maxLength={55}
+                          selection={{start: 0, end: 0}}
+                          onFocus={() => setLocationInputIsActive(true)}
+                          value={pickUplocationstate?.formatted}
+                          placeholder="Pickup Location"
+                          style={[
+                            tw`bg-white w-full h-12 rounded-2xl px-4 border border-black `,
+                            {textAlign: 'left', textAlignVertical: 'center'},
+                          ]}
+                        />
+                      </View>
+                      <View>
+                        <TextInput
+                          selection={{start: 0, end: 0}}
+                          textAlign="left"
+                          onFocus={() => setLocationInputIsActive(true)}
+                          value={dropLocationstate?.formatted}
+                          placeholder="Drop Location"
+                          style={[
+                            tw`bg-white w-100% h-12 rounded-2xl px-4  border-[1px] border-black`,
+                          ]}
+                        />
+                      </View>
+                    </View>
+
+                    {/* //show the price of the drive */}
+                    <View>
+                      {pickUplocationstate?.formatted &&
+                        dropLocationstate?.formatted &&
+                        price > 0 && (
+                          <Text
+                            style={tw`text-center font-medium text-base mt-2`}>
+                            Rs: {price}
+                          </Text>
+                        )}
+                    </View>
+
+                    {/* //find driver button */}
+                    <View
+                      style={[
+                        tw` w-full h-12 items-center justify-center mt-3`,
+                      ]}>
+                      <TouchableOpacity
+                        onPress={handelFindDriver}
+                        style={[
+                          tw` bg-black h-12 px-8 items-center justify-center rounded-2xl text-center`,
+                        ]}>
+                        <Text
+                          style={[
+                            tw` text-lg text-white`,
+                            {fontFamily: 'Quicksand-Bold'},
+                          ]}>
+                          Find Driver
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                ))}
-              </View>
-
-              {/* //location input */}
-              <View
-                style={[
-                  tw`flex flex-col gap-3 -mt-4 ${
-                    locationInputIsActive ? ' hidden' : ''
-                  }`,
-                ]}>
-                <View>
-                  <TextInput
-                    // maxLength={55}
-                    selection={{start: 0, end: 0}}
-                    onFocus={() => setLocationInputIsActive(true)}
-                    value={pickUplocationstate?.formatted}
-                    placeholder="Pickup Location"
-                    style={[
-                      tw`bg-white w-full h-12 rounded-2xl px-4 border border-black `,
-                      {textAlign: 'left', textAlignVertical: 'center'},
-                    ]}
-                  />
                 </View>
-                <View>
-                  <TextInput
-                    selection={{start: 0, end: 0}}
-                    textAlign="left"
-                    onFocus={() => setLocationInputIsActive(true)}
-                    value={dropLocationstate?.formatted}
-                    placeholder="Drop Location"
-                    style={[
-                      tw`bg-white w-100% h-12 rounded-2xl px-4  border-[1px] border-black`,
-                    ]}
-                  />
-                </View>
-              </View>
-
-              {/* //show the price of the drive */}
-              <View>
-                {pickUplocationstate?.formatted &&
-                  dropLocationstate?.formatted &&
-                  price > 0 && (
-                    <Text style={tw`text-center font-medium text-base mt-2`}>
-                      Rs: {price}
-                    </Text>
-                  )}
-              </View>
-
-              {/* //find driver button */}
-              <View style={[tw` w-full h-12 items-center justify-center mt-3`]}>
-                <TouchableOpacity
-                  onPress={handelFindDriver}
-                  style={[
-                    tw` bg-black h-12 px-8 items-center justify-center rounded-2xl text-center`,
-                  ]}>
-                  <Text
-                    style={[
-                      tw` text-lg text-white`,
-                      {fontFamily: 'Quicksand-Bold'},
-                    ]}>
-                    Find Driver
-                  </Text>
-                </TouchableOpacity>
-              </View>
+              )}
             </View>
-          </View>
-        )}
+          ) : (
+            <View>
+              <RequestUserRide/>
+            </View>
+          )}
+        </View>
       </View>
 
       {/* //if the setlocaitn is actinve show the location input */}
@@ -511,7 +530,7 @@ export default function Home({navigation}: any) {
         {userRole === 'captain' ? (
           <RequestUserRide />
         ) : (
-          <FindDriver vechicelName={vechicelType.name} price={price} />
+          <FindDriver vechicelName={vechicelType.name} price={price} distance={totalDistance} />
         )}
       </MotiView>
     </View>

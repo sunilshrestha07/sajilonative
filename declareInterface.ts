@@ -3,6 +3,7 @@ export interface DataSendByUserInterface {
     id: string;
     email: string;
     phone: string;
+    avatar: string;
     pickuplocation: {
         latitude: number;
         longitude: number;
@@ -15,6 +16,7 @@ export interface DataSendByUserInterface {
     };
     price: number;
     vechicelType: string;
+    distance: number;
 }
 export interface DataSendByDriverInterface {
     name: string;
@@ -32,5 +34,5 @@ export interface DataSendByDriverInterface {
         vehicleType:string
     }
     price:number
-    vehicleType:string
+    distance:number
 }

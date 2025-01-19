@@ -13,6 +13,7 @@ interface RideUser {
   id: string;
   email: string;
   phone: string;
+  avatar: string;
   pickuplocation: {
     latitude: number;
     longitude: number;
@@ -25,6 +26,7 @@ interface RideUser {
   };
   price: number;
   vechicelType: string;
+  distance: number;
 }
 interface RideDriver {
   name: string;
@@ -42,6 +44,7 @@ interface RideDriver {
     vehicleType: string;
   };
   price: number;
+  distance: number;
 }
 
 const initialState: RideState = {
@@ -59,10 +62,25 @@ const rideSlice = createSlice({
       state.loading = false;
       state.error = null;
       state.rideConfirmedDriver = action.payload;
-    }
+    },
+    rideBookedDriverEmpty(state) {
+      state.loading = false;
+      state.error = null;
+      state.rideConfirmedDriver = null;
+    },
+    rideBookedUserEmpty(state) {
+      state.loading = false;
+      state.error = null;
+      state.rideConfirmedUser = null;
+    },
+    rideBookedUserSuccess(state, action: PayloadAction<RideUser>) {
+      state.loading = false;
+      state.error = null;
+      state.rideConfirmedUser = action.payload;
+    },
   },
 });
 
-export const {rideBookedDriverSuccess} =
+export const {rideBookedDriverSuccess,rideBookedUserSuccess,rideBookedDriverEmpty,rideBookedUserEmpty} =
   rideSlice.actions;
 export default rideSlice.reducer;

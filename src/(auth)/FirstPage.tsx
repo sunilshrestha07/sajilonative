@@ -14,6 +14,10 @@ import CaptainLogin from './CaptainLogin';
 import CaptainSignup from './CaptainSignup';
 import Profile from '../screens/Profile';
 import Home from '../screens/Home';
+import CustomeDrawer from '../components/CustomeDrawer';
+import Setting from '../screens/Setting';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import DriverMode from '../screens/DriverMode';
 
 export default function FirstPage() {
   const Stack = createNativeStackNavigator();
@@ -27,13 +31,40 @@ export default function FirstPage() {
           width: 270,
         },
       }}
+      drawerContent={props => <CustomeDrawer {...props} />}
       initialRouteName="Home">
       <Drawer.Screen
         name="Home"
-        options={{headerShown: false}}
         component={Home}
+        options={{
+          headerShown: false,
+          drawerIcon: () => (
+            <Icon name="home" size={24} color="black" />
+          ),
+        }}
       />
-      <Drawer.Screen name="Profile" component={Profile} />
+      <Drawer.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          drawerIcon: () => <Icon name="person" size={24} color="black" />,
+        }}
+      />
+      <Drawer.Screen
+        name="Setting"
+        component={Setting}
+        options={{
+          drawerIcon: () => <Icon name="settings" size={24} color="black" />,
+        }}
+      />
+      <Drawer.Screen
+        name="Driver Mode"
+        component={DriverMode}
+        options={{
+          headerShown: false,
+          drawerIcon: () => <Icon name="directions-car" size={24} color="black" />,
+        }}
+      />
     </Drawer.Navigator>
   );
 

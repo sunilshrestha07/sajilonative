@@ -27,9 +27,11 @@ import {setSocket} from '../../redux/socketSlice';
 export default function FindDriver({
   vechicelName,
   price,
+  distance,
 }: {
   vechicelName: string;
   price: number;
+  distance: number;
 }) {
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const userId = currentUser?._id;
@@ -111,6 +113,7 @@ export default function FindDriver({
     id: currentUser?._id,
     email: currentUser?.email,
     phone: '9808048030',
+    avatar: currentUser?.avatar,
     pickuplocation: {
       latitude: pickUplocationstate?.lat,
       longitude: pickUplocationstate?.lon,
@@ -123,6 +126,7 @@ export default function FindDriver({
     },
     price: price,
     vechicelType: vechicelName,
+    distance: distance,
   };
 
   //useeffect for socket

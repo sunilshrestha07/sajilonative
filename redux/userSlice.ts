@@ -11,10 +11,20 @@ interface UserState {
 interface User {
     avatar: string;
     name:string,
-    phone:string,
     _id:string,
     email:string,
-    role:string
+    phone:string,
+    role:string,
+    location: {
+        latitude: number;
+        longitude: number;
+      };
+    vehicle:{
+        color:string,
+        plate:string,
+        vehicleType:string
+    }
+
 }
 
 

@@ -7,71 +7,34 @@ import {Image} from 'moti';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {TouchableHighlight} from 'react-native-gesture-handler';
-import {getDistance} from 'geolib';
 import {setIsCancelRideTrue, setIsRideBooked} from '../../redux/globalSlice';
+import {useResetReduxState} from '../hooks/resetRudux';
 
-export default function RideComfirmed() {
-  const rideConfirmedDriver = useSelector(
-    (state: RootState) => state.ride.rideConfirmedDriver,
+export default function UserRideConfirmed() {
+  const rideConfirmedUser = useSelector(
+    (state: RootState) => state.ride.rideConfirmedUser,
   );
-  const pickUplocationstate = useSelector(
-    (state: RootState) => state.location.currentPickUpLocation,
-  );
-  const dropLocationstate = useSelector(
-    (state: RootState) => state.location.currentDropOffLocation,
-  );
-  const [distance, setDistance] = useState<number>(0);
   const dispatch = useDispatch();
-  const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const socket = useSelector((state: RootState) => state.socket.socket);
-
-  //get the distance of the two poinsts
-  const calculateDistance = () => {
-    if (pickUplocationstate?.lat && dropLocationstate?.lat) {
-      const distance = getDistance(
-        {
-          latitude: pickUplocationstate.lat,
-          longitude: pickUplocationstate.lon,
-        },
-        {latitude: dropLocationstate.lat, longitude: dropLocationstate.lon},
-      );
-      const distanceinKm = distance / 1000;
-      setDistance(parseFloat(distanceinKm.toFixed(1)));
-    }
-    return 0;
-  };
-
-  useEffect(() => {
-    calculateDistance();
-  }, [rideConfirmedDriver]);
-
-  //formdata to send to the driver
-  const formdata = {
-    name: currentUser?.name,
-    email: currentUser?.email,
-    phone: currentUser?.phone,
-    id: currentUser?._id,
-  };
+  const resetReduxState = useResetReduxState();
 
   //useeffecf for socket
   useEffect(() => {
     if (!socket) return;
 
     //cancle ride
-    socket.on('CancelRide', () => {
-      console.log('cancle ride');
-    });
+
 
     return () => {
-      socket.off('CancelRide');
+      socket.off('rideHasBeenCancled');
     };
   }, []);
 
   //conformation for cancelling the ride
   const showConfirmationPopup = () => {
     Alert.alert(
-      'Confirm Cancellation',
-      'Are you sure you want to cancel the ride?',
+      'Confirm End Ride',
+      'Are you sure you want to end the ride?',
       [
         {
           text: 'No',
@@ -81,7 +44,7 @@ export default function RideComfirmed() {
         {
           text: 'Yes',
           onPress: () => {
-            handelCancelRide();
+            handleLogout();
           },
         },
       ],
@@ -89,9 +52,17 @@ export default function RideComfirmed() {
     );
   };
 
+  //handel logout
+  const handleLogout = async () => {
+    await resetReduxState();
+    dispatch(setIsRideBooked());
+
+    // Optionally navigate to a login screen
+  };
+
   //handel canle ride click event
   const handelCancelRide = () => {
-    socket?.emit('CancelRide', {driverId: rideConfirmedDriver?.id, formdata});
+    // socket?.emit('CancelRide', {driverId:rideConfirmedUser?.id,formdata});
     console.log(' ride cancle');
     dispatch(setIsRideBooked());
   };
@@ -107,7 +78,7 @@ export default function RideComfirmed() {
             ]}>
             <View style={[tw`w-8/12 flex-row gap-4 items-center `]}>
               <Image
-                source={{uri: rideConfirmedDriver?.avatar}}
+                source={{uri: rideConfirmedUser?.avatar}}
                 style={tw`w-13 aspect-square rounded-full`}
               />
               <View style={[tw` justify-center items-center `]}>
@@ -116,7 +87,7 @@ export default function RideComfirmed() {
                     tw` text-lg font-medium`,
                     {fontFamily: 'Quicksand-Bold'},
                   ]}>
-                  {rideConfirmedDriver?.name}
+                  {rideConfirmedUser?.name}
                 </Text>
                 <View style={[tw`flex-row items-center gap-2`]}>
                   <Icon
@@ -168,13 +139,13 @@ export default function RideComfirmed() {
                 style={[
                   tw`font-medium w-10/12 border-b-[1px] border-gray-300 py-3 pb-4  `,
                 ]}>
-                {pickUplocationstate?.formatted}
+                {rideConfirmedUser?.pickuplocation.name}
               </Text>
             </View>
             <View style={[tw` flex flex-row gap-6  items-center`]}>
               <MaterialIcons name="pin-drop" size={25} color="black" />
               <Text style={[tw`font-medium w-10/12  py-3  `]}>
-                {dropLocationstate?.formatted}
+                {rideConfirmedUser?.droplocation.name}
               </Text>
             </View>
 
@@ -190,9 +161,9 @@ export default function RideComfirmed() {
         <View>
           <View style={[tw` flex-row items-center justify-between px-5 py-2`]}>
             <View style={[tw` w-2/12 `]}>
-              {rideConfirmedDriver &&
-                (rideConfirmedDriver.vechicel.vehicleType === 'Car' ||
-                rideConfirmedDriver.vechicel.vehicleType === 'Comfort' ? (
+              {rideConfirmedUser &&
+                (rideConfirmedUser.vechicelType === 'Car' ||
+                rideConfirmedUser.vechicelType === 'Comfort' ? (
                   <MaterialIcons
                     name="directions-car"
                     size={40}
@@ -210,15 +181,20 @@ export default function RideComfirmed() {
               style={[tw`flex-row items-center justify-around gap-5  w-10/12`]}>
               <View style={[tw`flex-col gap-1`]}>
                 <Text style={[tw` opacity-60`]}>Distance</Text>
-                <Text>{rideConfirmedDriver?.distance} km</Text>
+                <Text>{rideConfirmedUser?.distance} km</Text>
               </View>
               <View style={[tw`flex-col gap-1`]}>
                 <Text style={[tw` opacity-60`]}>Time</Text>
-                <Text>{parseFloat(((distance / 30) * 60).toFixed(1))} min</Text>
+                <Text>
+                  {parseFloat(
+                    (((rideConfirmedUser?.distance ?? 0) / 30) * 60).toFixed(1),
+                  )}{' '}
+                  min
+                </Text>
               </View>
               <View style={[tw`flex-col gap-1`]}>
                 <Text style={[tw` opacity-60`]}>Price</Text>
-                <Text>Rs: {rideConfirmedDriver?.price}</Text>
+                <Text>Rs: {rideConfirmedUser?.price}</Text>
               </View>
             </View>
           </View>
@@ -233,7 +209,7 @@ export default function RideComfirmed() {
               style={[
                 tw`text-lg  font-semibold  text-white py-3 text-center `,
               ]}>
-              Cancel Request
+              Completed
             </Text>
           </TouchableHighlight>
         </View>

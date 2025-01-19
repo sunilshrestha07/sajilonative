@@ -28,9 +28,7 @@ export default function Signup({navigation}:any) {
       setPassword('')
       setPhone('')
       setIsSubmitting(false)
-
-      //if the signup is successful, navigate to the home screen
-      navigation.navigate('Home')
+      navigation.navigate('Login')
     } catch (error:any) {
       setIsSubmitting(false);
       Alert.alert("Error signingup", error.message);

@@ -1,14 +1,4 @@
-import {
-  Image,
-  PermissionsAndroid,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-  Platform,
-  Alert,
-  TouchableHighlight,
-} from 'react-native';
+import {Image, Pressable, StatusBar, StyleSheet, View} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import tw from 'twrnc';
 import useDarkMode from '../hooks/useDarkMode';
@@ -205,7 +195,9 @@ export default function Map({navigation}: any) {
         lat: currentLatitude || 0,
         lon: currentLongitude || 0,
       };
-      dispatch(pickUpLocationSuccess(locationDetails));
+      if (locationDetails) {
+        dispatch(pickUpLocationSuccess(locationDetails));
+      }
     } catch (error: any) {
       console.error(error.message);
     }
@@ -250,17 +242,6 @@ export default function Map({navigation}: any) {
             />
           </>
         )}
-        {isSearchingForDriver && (
-          <Marker
-            draggable
-            onDragEnd={e => handelPickUpDrag(e)}
-            coordinate={pickUpcords}>
-            <Image
-              source={require('../../assets/images/motorbike.png')}
-              style={[tw`w-14 h-14  `]}
-            />
-          </Marker>
-        )}
 
         {/* Show the directions */}
         {pickUplocation && dropLocation && (
@@ -273,22 +254,22 @@ export default function Map({navigation}: any) {
       </MapView>
 
       {/* //icon to tirgger the drawer */}
-      <TouchableHighlight
+      <Pressable
         onPress={() => navigation.openDrawer()}
         style={[
-          tw` absolute top-5 left-5 z-30 bg-white rounded-full p-1 aspect-square`,
+          tw` absolute top-10 left-5 z-30 bg-white rounded-full p-1 aspect-square`,
         ]}>
         <Icon style={[tw` z-50`]} name="menu" size={30} color={'black'} />
-      </TouchableHighlight>
+      </Pressable>
 
       {/* //add current locaiton as pickup locaiton */}
-      <TouchableHighlight
+      <Pressable
         onPress={findLocaitonName}
         style={[
           tw` flex absolute bottom-5 right-5  bg-white rounded-full p-1 aspect-square overflow-hidden items-center justify-center`,
         ]}>
         <Icon style={[tw` z-50`]} name="near-me" size={30} color={'black'} />
-      </TouchableHighlight>
+      </Pressable>
     </View>
   );
 }

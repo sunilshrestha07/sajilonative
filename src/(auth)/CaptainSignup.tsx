@@ -35,13 +35,14 @@ export default function CaptainSignup({navigation}: any) {
         email,
         phone,
         password,
+        role: 'captain',
         vehicle:{
           color,
           plate,
           vehicleType,
         },
       };
-      const res = await axios.post('https://sajiloride.vercel.app/api/captain/captainsignup',formdata)
+      const res = await axios.post('https://sajiloride.vercel.app/api/user/usersignup',formdata)
       setName('');
       setEmail('');
       setPassword('');
@@ -50,7 +51,8 @@ export default function CaptainSignup({navigation}: any) {
       setPlate('');
       setVehicleType('');
       setIsSubmitting(false);
-      Alert.alert('captain signup success');
+      navigation.navigate('CaptainLogin');
+      // Alert.alert('captain signup success');
     } catch (error: any) {
       setIsSubmitting(false);
       Alert.alert(`Error signup captain ${error.message}`);

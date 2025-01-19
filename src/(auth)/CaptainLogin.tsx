@@ -4,14 +4,16 @@ import useDarkMode from '../hooks/useDarkMode';
 import tw from 'twrnc';
 import colors from '../../assets/colors';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../../redux/userSlice';
 
 export default function CaptainLogin({navigation}:any) {
   const isDark = useDarkMode();
-  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isErrorActive, setIsErrorActive] = useState<boolean>(false);
+  const dispatch = useDispatch()
 
   const handleSignup = async () => {
     try {
@@ -20,11 +22,12 @@ export default function CaptainLogin({navigation}:any) {
         email,
         password
       }
-      const res = await axios.post('https://sajiloride.vercel.app/api/captain/captainlogin',formdata)
+      const res = await axios.post('https://sajiloride.vercel.app/api/user/userlogin',formdata)
       setEmail('')
       setPassword('')
       setIsSubmitting(false)
-      Alert.alert("Login Success")
+      dispatch(loginSuccess(res.data.user))
+      navigation.navigate('Home');
     } catch (error:any) {
       setIsSubmitting(false);
       Alert.alert("Error login", error.message);
@@ -112,4 +115,3 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 });
-

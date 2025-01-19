@@ -19,6 +19,8 @@ const rootReducer = combineReducers({
     socket:socketReducer
 });
 
+
+
 // Configuration for Redux Persist
 const persistConfig = {
     key: 'root',
