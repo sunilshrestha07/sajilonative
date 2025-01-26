@@ -7,29 +7,59 @@ import {Image} from 'moti';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {TouchableHighlight} from 'react-native-gesture-handler';
-import {setIsCancelRideTrue, setIsRideBooked} from '../../redux/globalSlice';
-import {useResetReduxState} from '../hooks/resetRudux';
+import {setIsCancelRideTrue, setIsFindRoutesActive, setIsRideBooked, setIsRideCompleted} from '../../redux/globalSlice';
+import {rideBookedUserEmpty} from '../../redux/rideSlice';
+import {
+  setendingLocation,
+  setstartingLocation,
+} from '../../redux/locationSlice';
 
-export default function UserRideConfirmed() {
+export default function StartRide() {
   const rideConfirmedUser = useSelector(
     (state: RootState) => state.ride.rideConfirmedUser,
   );
   const dispatch = useDispatch();
-  const socket = useSelector((state: RootState) => state.socket.socket);
-  const resetReduxState = useResetReduxState();
+  const socketDriver = useSelector(
+    (state: RootState) => state.socket.socketDriver,
+  );
+  const [isRideStarted, setIsRideStarted] = useState(false);
 
   //useeffecf for socket
   useEffect(() => {
-    if (!socket) return;
+    if (!socketDriver) return;
 
-    //cancle ride
-
+    socketDriver.on('rideHasBeenCancled', ({formdata}) => {
+      console.log('ride has been calcled by user');
+      dispatch(rideBookedUserEmpty());
+      dispatch(setIsRideBooked());
+      Alert.alert(`ride has been calcled by user ${formdata.name}`);
+    });
 
     return () => {
-      socket.off('rideHasBeenCancled');
+      socketDriver.off('rideHasBeenCancled');
     };
-  }, []);
+  }, [socketDriver]);
 
+  //handel canle ride click event
+  const handelRideStart = () => {
+    //if the rideconfirmed is available only then dispatch to the stating data
+    if (rideConfirmedUser) {
+      dispatch(setstartingLocation(rideConfirmedUser?.pickuplocation));
+      dispatch(setendingLocation(rideConfirmedUser?.droplocation));
+    }
+    dispatch(setIsFindRoutesActive())
+    //driver data already saved hune bhayara ra yo yesai pathako tyo driverdata ma
+    const driverdata = {
+      name: 'sajilo',
+    };
+    setIsRideStarted(true);
+    socketDriver?.emit('rideStarted', {
+      driverdata,
+      userId: rideConfirmedUser?.id,
+    });
+  };
+
+  //handel cancel end conformation
   //conformation for cancelling the ride
   const showConfirmationPopup = () => {
     Alert.alert(
@@ -44,7 +74,7 @@ export default function UserRideConfirmed() {
         {
           text: 'Yes',
           onPress: () => {
-            handleLogout();
+            handelComplete();
           },
         },
       ],
@@ -53,18 +83,15 @@ export default function UserRideConfirmed() {
   };
 
   //handel logout
-  const handleLogout = async () => {
-    await resetReduxState();
+  const handelComplete = () => {
+    console.log('Ride completed');
+    //driver data already saved hune bhayara ra yo yesai pathako tyo driverdata ma userkai
+    socketDriver?.emit('rideCompleted', {
+      driverdata: rideConfirmedUser,
+      userId: rideConfirmedUser?.id,
+    });
     dispatch(setIsRideBooked());
-
-    // Optionally navigate to a login screen
-  };
-
-  //handel canle ride click event
-  const handelCancelRide = () => {
-    // socket?.emit('CancelRide', {driverId:rideConfirmedUser?.id,formdata});
-    console.log(' ride cancle');
-    dispatch(setIsRideBooked());
+    dispatch(setIsRideCompleted());
   };
 
   return (
@@ -74,7 +101,7 @@ export default function UserRideConfirmed() {
         <View>
           <View
             style={[
-              tw` w-full  flex-row items-center justify-between px-5 py-2 bg-gray-200 `,
+              tw` w-full  flex-row items-center justify-between px-5 py-3 bg-gray-200 `,
             ]}>
             <View style={[tw`w-8/12 flex-row gap-4 items-center `]}>
               <Image
@@ -84,20 +111,11 @@ export default function UserRideConfirmed() {
               <View style={[tw` justify-center items-center `]}>
                 <Text
                   style={[
-                    tw` text-lg font-medium`,
+                    tw` text-lg font-bold`,
                     {fontFamily: 'Quicksand-Bold'},
                   ]}>
                   {rideConfirmedUser?.name}
                 </Text>
-                <View style={[tw`flex-row items-center gap-2`]}>
-                  <Icon
-                    style={[tw` z-50`]}
-                    name="star"
-                    size={23}
-                    color={'orange'}
-                  />
-                  <Text style={[tw` opacity-50`]}>4.5</Text>
-                </View>
               </View>
             </View>
             <View>
@@ -201,17 +219,30 @@ export default function UserRideConfirmed() {
         </View>
 
         {/* //cancel button */}
-        <View style={[tw`w-100% px-5 mt-3 `]}>
-          <TouchableHighlight
-            onPress={showConfirmationPopup}
-            style={[tw`w-100% rounded-lg bg-black overflow-hidden`]}>
-            <Text
-              style={[
-                tw`text-lg  font-semibold  text-white py-3 text-center `,
-              ]}>
-              Completed
-            </Text>
-          </TouchableHighlight>
+        <View style={[tw`w-100% px-5 mt-4 `]}>
+          {isRideStarted ? (
+            <TouchableHighlight
+              onPress={showConfirmationPopup}
+              style={[tw`w-100% rounded-lg bg-black overflow-hidden`]}>
+              <Text
+                style={[
+                  tw`text-lg  font-semibold  text-white py-3 text-center `,
+                ]}>
+                Completed
+              </Text>
+            </TouchableHighlight>
+          ) : (
+            <TouchableHighlight
+              onPress={handelRideStart}
+              style={[tw`w-100% rounded-lg bg-black overflow-hidden`]}>
+              <Text
+                style={[
+                  tw`text-lg  font-semibold  text-white py-3 text-center `,
+                ]}>
+                Start Ride
+              </Text>
+            </TouchableHighlight>
+          )}
         </View>
       </View>
     </View>

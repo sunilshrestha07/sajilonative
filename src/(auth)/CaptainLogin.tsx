@@ -51,7 +51,7 @@ export default function CaptainLogin({navigation}:any) {
         </View>
         <View style={[tw`py-5 gap-5`]}>
           <View>
-            <Text style={[tw`text-lg font-medium ${isDark ? "text-gray-300":"text-gray-700"}`,{fontFamily:'Quicksand-Bold'}]}>Email</Text>
+            <Text style={[tw`text-lg font-medium `,{fontFamily:'Quicksand-Bold'}]}>Email</Text>
             <TextInput
               placeholder="userone@gmail.com"
               value={email}
@@ -60,7 +60,7 @@ export default function CaptainLogin({navigation}:any) {
             />
           </View>
           <View>
-            <Text style={[tw`text-lg font-medium ${isDark ? "text-gray-300":"text-gray-700"}`,{fontFamily:'Quicksand-Bold'}]}>Password</Text>
+            <Text style={[tw`text-lg font-medium `,{fontFamily:'Quicksand-Bold'}]}>Password</Text>
             <TextInput
               secureTextEntry
               placeholder="*********"

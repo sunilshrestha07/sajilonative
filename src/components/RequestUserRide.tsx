@@ -19,13 +19,12 @@ import {
   rideBookedUserSuccess,
 } from '../../redux/rideSlice';
 import {setIsRideBooked} from '../../redux/globalSlice';
-import UserRideConfirmed from './UserRideConfirmed';
-import {setSocket} from '../../redux/socketSlice';
+import {setdriversocket} from '../../redux/socketSlice';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import StartRide from './StartRide';
 
 export default function RequestUserRide() {
-  const socketRef = useRef<Socket | null>(null);
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
-  const driverId = currentUser?._id;
   const [userRideData, setUserRideData] = useState<DataSendByUserInterface[]>(
     [],
   );
@@ -33,19 +32,25 @@ export default function RequestUserRide() {
     (state: RootState) => state.global.isRideBooked,
   );
   const dispatch = useDispatch();
+  const socketRef = useRef<Socket | null>(null);
+  const driverlocation = useSelector(
+    (state: RootState) => state.location.driverlocation,
+  );
 
   useEffect(() => {
-    if (!driverId) return;
     const socket = io(
       'https://socketiobackendtest-production.up.railway.app/',
       {
+        transports: ['websocket'], // Ensures WebSocket is used
+        autoConnect: true,
+        reconnectionDelay: 1000,
         auth: {
-          drivertoken: driverId,
+          drivertoken: currentUser?._id,
         },
       },
     );
-    dispatch(setSocket(socket));
     socketRef.current = socket;
+    dispatch(setdriversocket(socket));
 
     socket.on('broadCastDrives', ({formdata}) => {
       const data = formdata.formdata;
@@ -61,6 +66,7 @@ export default function RequestUserRide() {
       setUserRideData(filtered =>
         filtered.filter(data => data.id !== formdata.id),
       );
+      console.log('ride has been accepted');
     });
 
     socket.on('terminateFindDriverRequest', ({formdata}) => {
@@ -71,13 +77,6 @@ export default function RequestUserRide() {
 
     socket.on('requestRideToUser', () => {
       console.log('driver made request to the user');
-    });
-
-    socket.on('rideHasBeenCancled', ({formdata}) => {
-      console.log('ride has been calcled by user');
-      dispatch(rideBookedUserEmpty());
-      dispatch(setIsRideBooked());
-      Alert.alert(`ride has been calcled by user ${formdata.name}`);
     });
 
     return () => {
@@ -100,8 +99,8 @@ export default function RequestUserRide() {
       phone: currentUser?.phone,
       avatar: currentUser?.avatar,
       location: {
-        latitude: 0,
-        longitude: 0,
+        latitude: driverlocation?.lat || data.pickuplocation.latitude - 0.0015,
+        longitude: driverlocation?.lon || data.pickuplocation.longitude - 0.00099,
       },
       vechicel: {
         color: currentUser?.vehicle.color,
@@ -111,7 +110,16 @@ export default function RequestUserRide() {
       price: data.price,
       distance: data.distance,
     };
-    socketRef.current.emit('requestRideToUser', {driverData, userId});
+    if (driverData.location.latitude && driverData.location.longitude) {
+      socketRef.current.emit('requestRideToUser', {driverData, userId});
+    } else {
+      Alert.alert('You are have to set to active status');
+    }
+  };
+  const handelReject = (formdata: DataSendByUserInterface) => {
+    setUserRideData(filtered =>
+      filtered.filter(data => data.id !== formdata.id),
+    );
   };
 
   return (
@@ -119,7 +127,7 @@ export default function RequestUserRide() {
       <View>
         {isRideBooked ? (
           <View>
-            <UserRideConfirmed />
+            <StartRide />
           </View>
         ) : (
           <View
@@ -139,40 +147,82 @@ export default function RequestUserRide() {
                     data={userRideData}
                     renderItem={({item}) => (
                       <View
-                        style={[tw`w-100% py-1 rounded-md bg-gray-400 my-2`]}>
+                        style={[
+                          tw`w-100% py-2 rounded-md bg-gray-300 my-2 flex-col gap-2 px-2 `,
+                        ]}>
                         <View
                           style={[
-                            tw` flex flex-row  items-center justify-around `,
+                            tw` flex flex-row items-center  gap-4 px-4  py-2 `,
                           ]}>
                           <View
                             style={[
-                              tw` w-15 aspect-square rounded-full overflow-hidden `,
+                              tw` w-15 aspect-square rounded-full overflow-hidden bg-white `,
                             ]}>
                             <Image
                               style={[tw` w-full h-full`]}
                               source={{uri: item.avatar}}
                             />
                           </View>
-                          <View style={[tw` justify-center`]}>
-                            <Text style={[tw` text-xl font-semibold `]}>
-                              {item.name}
-                            </Text>
-                            <Text style={[tw` text-sm opacity-90  `]}>
-                              {item.pickuplocation.name}
-                            </Text>
-                            <Text style={[tw` text-sm opacity-90  `]}>
-                              {item.droplocation.name}
-                            </Text>
-                            <Text>Rs:100</Text>
+                          <View>
+                            <View>
+                              <Text style={[tw` font-medium text-2xl`]}>
+                                {item.name}
+                              </Text>
+                            </View>
+                            <View style={[tw` flex flex-row gap-2 opacity-85`]}>
+                              <View>
+                                <Text>Price :Rs {item.price} ||</Text>
+                              </View>
+                              <View>
+                                <Text> Distance :{item.distance} km</Text>
+                              </View>
+                            </View>
                           </View>
+                        </View>
+                        <View style={[tw` flex flex-col `]}>
+                          <View
+                            style={[tw` flex flex-col gap-2 px-4 opacity-85`]}>
+                            <View
+                              style={[
+                                tw`flex flex-row gap-1 items-center text-center`,
+                              ]}>
+                              <Image
+                                source={require('../../assets/images/pin.png')}
+                                style={[tw`w-6 h-6`]}
+                              />
+                              <Text>{item.pickuplocation.name}</Text>
+                            </View>
+                            <View
+                              style={[
+                                tw`flex flex-row gap-1 items-center text-center`,
+                              ]}>
+                              <Icon name="flag" size={23} color="red" />
+                              <Text> {item.droplocation.name}</Text>
+                            </View>
+                          </View>
+                        </View>
+                        <View
+                          style={[
+                            tw` flex flex-row justify-evenly w-full py-2 `,
+                          ]}>
                           <TouchableOpacity
-                            style={[tw`  justify-center`]}
+                            style={[tw`  w-2/5 justify-center`]}
                             onPress={() => requestUser(item)}>
                             <Text
                               style={[
-                                tw` bg-white px-10 py-4 rounded-lg text-center`,
+                                tw` bg-green-600 text-white  py-3 rounded-lg text-center`,
                               ]}>
                               Request
+                            </Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={[tw` w-2/5  justify-center`]}
+                            onPress={() => handelReject(item)}>
+                            <Text
+                              style={[
+                                tw` bg-red-500 text-white  py-3 rounded-lg text-center`,
+                              ]}>
+                              Reject
                             </Text>
                           </TouchableOpacity>
                         </View>

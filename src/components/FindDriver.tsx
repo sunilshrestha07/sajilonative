@@ -15,7 +15,9 @@ import {
   resetIsCancelRideTrue,
   setIsCancelRideTrue,
   setIsRideBooked,
+  setIsRideStartedFalse,
   setIsSearchingForDriver,
+  setTotalPrice,
 } from '../../redux/globalSlice';
 import {RootState} from '../../redux/store';
 import {io, Socket} from 'socket.io-client';
@@ -138,6 +140,9 @@ export default function FindDriver({
         auth: {
           token: userId,
         },
+        transports: ['websocket'],
+        autoConnect: true,
+        reconnectionDelay: 1000,
       },
     );
     socketRef.current = socket;
@@ -170,7 +175,7 @@ export default function FindDriver({
       socket.off('findDriver');
       socket.off('driverResponse');
       socket.off('AcceptRequest');
-      socket.off('AcceptRequest');
+      socket.off('cancelRide');
     };
   }, []);
 
@@ -181,6 +186,8 @@ export default function FindDriver({
       try {
         //data to send when the user clicks find driver
         socketRef.current?.emit('findDriver', {formdata});
+        dispatch(setTotalPrice(price));
+        dispatch(setIsRideStartedFalse())
       } catch (error) {
         console.log('Error finding driver', error);
       }

@@ -24,15 +24,16 @@ import {
   pickUpLocationSuccess,
   changerefreshstate,
   emptyPickUpLocation,
+  emptyDropOffLocationLocation,
 } from '../../redux/locationSlice';
 import {RootState} from '../../redux/store';
 import {getDistance} from 'geolib';
-import {io, Socket} from 'socket.io-client';
 import FindDriver from '../components/FindDriver';
-import Motiview, {MotiView} from 'moti';
+import  {MotiView} from 'moti';
 import {setIsSearchingForDriver} from '../../redux/globalSlice';
 import RequestUserRide from '../components/RequestUserRide';
 import RideComfirmed from '../components/RideComfirmed';
+import PaymentPopUp from '../components/PaymentPopUp';
 
 interface locaitonDetails {
   formatted: string;
@@ -100,6 +101,12 @@ export default function Home({navigation}: any) {
   const [userRole, setUserRole] = useState<string>('user');
   const isRideBooked = useSelector(
     (state: RootState) => state.global.isRideBooked,
+  );
+  const isPopUpActive = useSelector(
+    (state: RootState) => state.global.isPopUpActive,
+  );
+  const isRideCompleted = useSelector(
+    (state: RootState) => state.global.isRideCompleted,
   );
 
   //options for the ride
@@ -199,6 +206,7 @@ export default function Home({navigation}: any) {
     setDropLocation('');
     setLocationRecommendaion([]);
     setDropLocationAllInfo(null);
+    dispatch(emptyDropOffLocationLocation());
   };
 
   //handel selected specific location and store in redux
@@ -273,6 +281,11 @@ export default function Home({navigation}: any) {
       Alert.alert('Please select pickup and drop location');
     }
   };
+
+  useEffect(() => {
+    setPickupLocation(pickUplocationstate?.formatted || '');
+    setDropLocation(dropLocationstate?.formatted || '');
+  }, [isRideCompleted]);
 
   return (
     <View style={[tw` h-100%  w-full relative`]}>
@@ -402,7 +415,7 @@ export default function Home({navigation}: any) {
             </View>
           ) : (
             <View>
-              <RequestUserRide/>
+              <RequestUserRide />
             </View>
           )}
         </View>
@@ -411,17 +424,17 @@ export default function Home({navigation}: any) {
       {/* //if the setlocaitn is actinve show the location input */}
       <MotiView
         from={{
-          translateY: 800,
+          translateY: 1000,
         }}
         animate={{
-          translateY: locationInputIsActive ? 0 : 900,
+          translateY: locationInputIsActive ? 200 : 1000,
         }}
         transition={{
           type: 'timing', // Smooth animation
           duration: 400, // Same duration for consistency
         }}
         style={[
-          tw`w-100% h-100% pt-4 px-2 border-[1px] border-black bg-white absolute z-50 top-0 flex flex-col gap-4`,
+          tw`w-100% h-100% pt-4 px-2  bg-white rounded-3xl absolute z-50 top-0 flex flex-col gap-4`,
         ]}>
         <View
           style={[tw`flex flex-row h-10 justify-center items-center w-100% `]}>
@@ -515,10 +528,10 @@ export default function Home({navigation}: any) {
       {/* //find the driver component popup */}
       <MotiView
         from={{
-          translateY: 500,
+          translateY: 700,
         }}
         animate={{
-          translateY: isSearchingForDriver ? 0 : 500,
+          translateY: isSearchingForDriver ? 0 : 700,
         }}
         transition={{
           type: 'timing', // Smooth animation
@@ -530,8 +543,28 @@ export default function Home({navigation}: any) {
         {userRole === 'captain' ? (
           <RequestUserRide />
         ) : (
-          <FindDriver vechicelName={vechicelType.name} price={price} distance={totalDistance} />
+          <FindDriver
+            vechicelName={vechicelType.name}
+            price={price}
+            distance={totalDistance}
+          />
         )}
+      </MotiView>
+
+      {/* show the payment popup*/}
+      <MotiView
+        from={{
+          translateY: 1200,
+        }}
+        animate={{
+          translateY: isPopUpActive ? 0 : 1200,
+        }}
+        transition={{
+          type: 'timing', // Smooth animation
+          duration: 300, // Same duration for consistency
+        }}
+        style={[tw` absolute bottom-0 left-0  h-100% w-100%   `]}>
+        {userRole === 'user' && <PaymentPopUp />}
       </MotiView>
     </View>
   );

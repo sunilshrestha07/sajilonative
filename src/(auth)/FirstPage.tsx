@@ -17,7 +17,7 @@ import Home from '../screens/Home';
 import CustomeDrawer from '../components/CustomeDrawer';
 import Setting from '../screens/Setting';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import DriverMode from '../screens/DriverMode';
+import MyRides from '../screens/MyRides';
 
 export default function FirstPage() {
   const Stack = createNativeStackNavigator();
@@ -50,18 +50,17 @@ export default function FirstPage() {
           drawerIcon: () => <Icon name="person" size={24} color="black" />,
         }}
       />
-      <Drawer.Screen
+      {/* <Drawer.Screen
         name="Setting"
         component={Setting}
         options={{
           drawerIcon: () => <Icon name="settings" size={24} color="black" />,
         }}
-      />
+      /> */}
       <Drawer.Screen
-        name="Driver Mode"
-        component={DriverMode}
+        name="Ride History"
+        component={MyRides}
         options={{
-          headerShown: false,
           drawerIcon: () => <Icon name="directions-car" size={24} color="black" />,
         }}
       />

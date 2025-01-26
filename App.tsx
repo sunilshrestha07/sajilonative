@@ -1,27 +1,30 @@
 import {StatusBar, StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import FirstPage from './src/(auth)/FirstPage';
 import useDarkMode from './src/hooks/useDarkMode';
 import {PersistGate} from 'redux-persist/integration/react';
 import {Provider} from 'react-redux';
 import {persistor, store} from './redux/store';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import SplashScreen from 'react-native-splash-screen';
 
 export default function App() {
   const isDark = useDarkMode();
+
+  useEffect(() => {
+    SplashScreen.hide();
+  },[])
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <Provider store={store}>
       <PersistGate persistor={persistor}>
-        <Provider store={store}>
+        <GestureHandlerRootView style={{flex: 1}}>
           <View style={styles.container}>
-            <StatusBar
-              barStyle="dark-content"
-            />
+            <StatusBar barStyle="dark-content" />
             <FirstPage />
           </View>
-        </Provider>
+        </GestureHandlerRootView>
       </PersistGate>
-    </GestureHandlerRootView>
+    </Provider>
   );
 }
 

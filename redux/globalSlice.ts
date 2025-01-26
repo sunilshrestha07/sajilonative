@@ -1,4 +1,4 @@
-import {createSlice} from '@reduxjs/toolkit';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 interface GlobalState {
   isLoading: boolean;
   isDarkMode: boolean;
@@ -6,6 +6,11 @@ interface GlobalState {
   isSearchingForDriver: boolean;
   isRideBooked: boolean;
   isCancelRideTrue: boolean;
+  isRideStarted: boolean;
+  isRideCompleted: boolean;
+  isFindRoutesActive: boolean;
+  isPopUpActive: boolean;
+  totalPrice:number
 }
 
 const initialState: GlobalState = {
@@ -15,6 +20,11 @@ const initialState: GlobalState = {
   isSearchingForDriver: false,
   isRideBooked: false,
   isCancelRideTrue: false,
+  isRideStarted: false,
+  isRideCompleted: false,
+  isFindRoutesActive: false,
+  isPopUpActive: false,
+  totalPrice:0,
 };
 
 const globalSlice = createSlice({
@@ -42,6 +52,23 @@ const globalSlice = createSlice({
     resetIsCancelRideTrue: state => {
       state.isCancelRideTrue = false;
     },
+    setIsRideStarted: state => {
+      state.isRideStarted = !state.isRideStarted;
+    },
+    setIsRideCompleted: state => {
+      state.isRideCompleted = !state.isRideCompleted;
+    },
+    setIsFindRoutesActive: state => {
+      state.isFindRoutesActive = !state.isFindRoutesActive;
+    },
+    setIsPopUpActive: state => {
+      state.isPopUpActive = !state.isPopUpActive;
+    },
+    setTotalPrice:(state,action:PayloadAction<number>)=>{state.totalPrice = action.payload
+    },
+    setIsRideStartedFalse: state => {
+      state.isRideStarted = false;
+    }
   },
 });
 
@@ -52,6 +79,12 @@ export const {
   setIsCancelRideTrue,
   setIsSearchingForDriver,
   setIsRideBooked,
-  resetIsCancelRideTrue
+  resetIsCancelRideTrue,
+  setIsRideStarted,
+  setIsRideCompleted,
+  setIsFindRoutesActive,
+  setIsPopUpActive,
+  setTotalPrice,
+  setIsRideStartedFalse
 } = globalSlice.actions;
 export default globalSlice.reducer;

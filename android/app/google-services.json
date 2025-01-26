@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "632861881778",
+    "project_id": "sajiloride-7d144",
+    "storage_bucket": "sajiloride-7d144.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:632861881778:android:523928b0e8b1a3b11760ab",
+        "android_client_info": {
+          "package_name": "com.sajiloridenative"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjou_eP37WcMZqv2L8C9AsOsHRZXqfOK8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

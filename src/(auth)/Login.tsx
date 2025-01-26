@@ -14,8 +14,8 @@ import tw from 'twrnc';
 import colors from '../../assets/colors';
 import axios from 'axios';
 import {Link} from '@react-navigation/native';
-import { useDispatch } from 'react-redux';
-import { loginSuccess } from '../../redux/userSlice';
+import {useDispatch} from 'react-redux';
+import {loginSuccess} from '../../redux/userSlice';
 
 export default function Login({navigation}: any) {
   const isDark = useDarkMode();
@@ -24,7 +24,7 @@ export default function Login({navigation}: any) {
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isErrorActive, setIsErrorActive] = useState<boolean>(false);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const handleSignup = async () => {
     try {
@@ -37,7 +37,7 @@ export default function Login({navigation}: any) {
         'https://sajiloride.vercel.app/api/user/userlogin',
         formdata,
       );
-      dispatch(loginSuccess(res.data.user))
+      dispatch(loginSuccess(res.data.user));
       setEmail('');
       setPassword('');
       setIsSubmitting(false);
@@ -67,9 +67,7 @@ export default function Login({navigation}: any) {
           <View>
             <Text
               style={[
-                tw`text-lg font-medium ${
-                  isDark ? 'text-gray-300' : 'text-gray-700'
-                }`,
+                tw`text-lg font-medium `,
                 {fontFamily: 'Quicksand-Bold'},
               ]}>
               Email
@@ -84,9 +82,7 @@ export default function Login({navigation}: any) {
           <View>
             <Text
               style={[
-                tw`text-lg font-medium ${
-                  isDark ? 'text-gray-300' : 'text-gray-700'
-                }`,
+                tw`text-lg font-medium `,
                 {fontFamily: 'Quicksand-Bold'},
               ]}>
               Password

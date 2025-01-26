@@ -8,7 +8,15 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {TouchableHighlight} from 'react-native-gesture-handler';
 import {getDistance} from 'geolib';
-import {setIsCancelRideTrue, setIsRideBooked} from '../../redux/globalSlice';
+import {
+  setIsCancelRideTrue,
+  setIsPopUpActive,
+  setIsRideBooked,
+  setIsRideCompleted,
+  setIsRideStarted,
+} from '../../redux/globalSlice';
+import WaitingForDriver from './WaitingForDriver';
+import { emptyDropOffLocationLocation, emptyPickUpLocation } from '../../redux/locationSlice';
 
 export default function RideComfirmed() {
   const rideConfirmedDriver = useSelector(
@@ -24,6 +32,9 @@ export default function RideComfirmed() {
   const dispatch = useDispatch();
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const socket = useSelector((state: RootState) => state.socket.socket);
+  const isRideStated = useSelector(
+    (state: RootState) => state.global.isRideStarted,
+  );
 
   //get the distance of the two poinsts
   const calculateDistance = () => {
@@ -62,8 +73,25 @@ export default function RideComfirmed() {
       console.log('cancle ride');
     });
 
+    //cancle ride
+    socket.on('rideStarted', () => {
+      console.log('ride has started');
+      dispatch(setIsRideStarted());
+    });
+
+    socket.on('rideCompleted', () => {
+      console.log('ride has been  completed');
+      dispatch(emptyDropOffLocationLocation());
+      dispatch(emptyPickUpLocation());
+      dispatch(setIsRideCompleted());
+      dispatch(setIsRideBooked());
+      dispatch(setIsPopUpActive());
+    });
+
     return () => {
       socket.off('CancelRide');
+      socket.off('rideStarted');
+      socket.off('rideCompleted');
     };
   }, []);
 
@@ -97,147 +125,161 @@ export default function RideComfirmed() {
   };
 
   return (
-    <View style={[tw` w-full h-full rounded-lg overflow-hidden  `]}>
-      <View>
-        {/* //this the profile and message and call bar */}
-        <View>
-          <View
-            style={[
-              tw` w-full  flex-row items-center justify-between px-5 py-2 bg-gray-200 `,
-            ]}>
-            <View style={[tw`w-8/12 flex-row gap-4 items-center `]}>
-              <Image
-                source={{uri: rideConfirmedDriver?.avatar}}
-                style={tw`w-13 aspect-square rounded-full`}
-              />
-              <View style={[tw` justify-center items-center `]}>
-                <Text
-                  style={[
-                    tw` text-lg font-medium`,
-                    {fontFamily: 'Quicksand-Bold'},
-                  ]}>
-                  {rideConfirmedDriver?.name}
-                </Text>
-                <View style={[tw`flex-row items-center gap-2`]}>
-                  <Icon
-                    style={[tw` z-50`]}
-                    name="star"
-                    size={23}
-                    color={'orange'}
+    <View>
+      {isRideStated ? (
+        <View style={[tw` w-full h-full rounded-lg overflow-hidden  `]}>
+          <View>
+            {/* //this the profile and message and call bar */}
+            <View>
+              <View
+                style={[
+                  tw` w-full  flex-row items-center justify-between px-5 py-3 bg-gray-200 `,
+                ]}>
+                <View style={[tw`w-8/12 flex-row gap-4 items-center `]}>
+                  <Image
+                    source={{uri: rideConfirmedDriver?.avatar}}
+                    style={tw`w-13 aspect-square rounded-full`}
                   />
-                  <Text style={[tw` opacity-50`]}>4.5</Text>
+                  <View style={[tw` justify-center items-center `]}>
+                    <Text
+                      style={[
+                        tw` text-lg font-medium`,
+                        {fontFamily: 'Quicksand-Bold'},
+                      ]}>
+                      {rideConfirmedDriver?.name}
+                    </Text>
+                    <View style={[tw`flex-row items-center gap-2`]}>
+                      <Icon
+                        style={[tw` z-50`]}
+                        name="star"
+                        size={23}
+                        color={'orange'}
+                      />
+                      <Text style={[tw` opacity-50`]}>4.5</Text>
+                    </View>
+                  </View>
+                </View>
+                <View>
+                  <View style={[tw`flex-row gap-5 items-center `]}>
+                    <TouchableHighlight>
+                      <View
+                        style={[tw`bg-blue-400 p-2 rounded-full items-center`]}>
+                        <Icon
+                          style={[tw` z-50`]}
+                          name="message"
+                          size={25}
+                          color={'black'}
+                        />
+                      </View>
+                    </TouchableHighlight>
+                    <TouchableHighlight>
+                      <View
+                        style={[tw`bg-blue-400 p-2 rounded-full items-center`]}>
+                        <Icon
+                          style={[tw` z-50`]}
+                          name="phone"
+                          size={25}
+                          color={'black'}
+                        />
+                      </View>
+                    </TouchableHighlight>
+                  </View>
                 </View>
               </View>
             </View>
+
+            {/* //this the location info section */}
             <View>
-              <View style={[tw`flex-row gap-5 items-center `]}>
-                <TouchableHighlight>
-                  <View style={[tw`bg-blue-400 p-2 rounded-full items-center`]}>
-                    <Icon
-                      style={[tw` z-50`]}
-                      name="message"
-                      size={25}
-                      color={'black'}
-                    />
-                  </View>
-                </TouchableHighlight>
-                <TouchableHighlight>
-                  <View style={[tw`bg-blue-400 p-2 rounded-full items-center`]}>
-                    <Icon
-                      style={[tw` z-50`]}
-                      name="phone"
-                      size={25}
-                      color={'black'}
-                    />
-                  </View>
-                </TouchableHighlight>
-              </View>
-            </View>
-          </View>
-        </View>
-
-        {/* //this the location info section */}
-        <View>
-          <View
-            style={[
-              tw`flex-col px-2  items-end  py-3 relative border-b-[1px] border-gray-300  `,
-            ]}>
-            <View style={[tw` flex flex-row gap-6  items-center`]}>
-              <MaterialIcons name="my-location" size={25} color="orange" />;
-              <Text
+              <View
                 style={[
-                  tw`font-medium w-10/12 border-b-[1px] border-gray-300 py-3 pb-4  `,
+                  tw`flex-col px-2  items-end  py-3 relative border-b-[1px] border-gray-300  `,
                 ]}>
-                {pickUplocationstate?.formatted}
-              </Text>
-            </View>
-            <View style={[tw` flex flex-row gap-6  items-center`]}>
-              <MaterialIcons name="pin-drop" size={25} color="black" />
-              <Text style={[tw`font-medium w-10/12  py-3  `]}>
-                {dropLocationstate?.formatted}
-              </Text>
+                <View style={[tw` flex flex-row gap-6  items-center`]}>
+                  <MaterialIcons name="my-location" size={25} color="orange" />;
+                  <Text
+                    style={[
+                      tw`font-medium w-10/12 border-b-[1px] border-gray-300 py-3 pb-4  `,
+                    ]}>
+                    {pickUplocationstate?.formatted}
+                  </Text>
+                </View>
+                <View style={[tw` flex flex-row gap-6  items-center`]}>
+                  <MaterialIcons name="pin-drop" size={25} color="black" />
+                  <Text style={[tw`font-medium w-10/12  py-3  `]}>
+                    {dropLocationstate?.formatted}
+                  </Text>
+                </View>
+
+                {/* absolute line */}
+                <View
+                  style={[
+                    tw`absolute top-12 left-[9.5%] bg-black h-[25%] w-[1px]`,
+                  ]}></View>
+              </View>
             </View>
 
-            {/* absolute line */}
-            <View
-              style={[
-                tw`absolute top-12 left-[9.5%] bg-black h-[25%] w-[1px]`,
-              ]}></View>
+            {/* //this the the distance price and vehicle type */}
+            <View>
+              <View
+                style={[tw` flex-row items-center justify-between px-5 py-2`]}>
+                <View style={[tw` w-2/12 `]}>
+                  {rideConfirmedDriver &&
+                    (rideConfirmedDriver.vechicel.vehicleType === 'Car' ||
+                    rideConfirmedDriver.vechicel.vehicleType === 'Comfort' ? (
+                      <MaterialIcons
+                        name="directions-car"
+                        size={40}
+                        color="black"
+                      />
+                    ) : (
+                      <MaterialIcons
+                        name="directions-bike"
+                        size={40}
+                        color="black"
+                      />
+                    ))}
+                </View>
+                <View
+                  style={[
+                    tw`flex-row items-center justify-around gap-5  w-10/12`,
+                  ]}>
+                  <View style={[tw`flex-col gap-1`]}>
+                    <Text style={[tw` opacity-60`]}>Distance</Text>
+                    <Text>{rideConfirmedDriver?.distance} km</Text>
+                  </View>
+                  <View style={[tw`flex-col gap-1`]}>
+                    <Text style={[tw` opacity-60`]}>Time</Text>
+                    <Text>
+                      {parseFloat(((distance / 30) * 60).toFixed(1))} min
+                    </Text>
+                  </View>
+                  <View style={[tw`flex-col gap-1`]}>
+                    <Text style={[tw` opacity-60`]}>Price</Text>
+                    <Text>Rs: {rideConfirmedDriver?.price}</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+
+            {/* //cancel button */}
+            <View style={[tw`w-100% px-5 mt-3 `]}>
+              <TouchableHighlight
+                style={[tw`w-100% rounded-lg bg-black overflow-hidden`]}>
+                <Text
+                  style={[
+                    tw`text-lg  font-semibold  text-white py-3 text-center `,
+                  ]}>
+                    Ride has stated
+                </Text>
+              </TouchableHighlight>
+            </View>
           </View>
         </View>
-
-        {/* //this the the distance price and vehicle type */}
+      ) : (
         <View>
-          <View style={[tw` flex-row items-center justify-between px-5 py-2`]}>
-            <View style={[tw` w-2/12 `]}>
-              {rideConfirmedDriver &&
-                (rideConfirmedDriver.vechicel.vehicleType === 'Car' ||
-                rideConfirmedDriver.vechicel.vehicleType === 'Comfort' ? (
-                  <MaterialIcons
-                    name="directions-car"
-                    size={40}
-                    color="black"
-                  />
-                ) : (
-                  <MaterialIcons
-                    name="directions-bike"
-                    size={40}
-                    color="black"
-                  />
-                ))}
-            </View>
-            <View
-              style={[tw`flex-row items-center justify-around gap-5  w-10/12`]}>
-              <View style={[tw`flex-col gap-1`]}>
-                <Text style={[tw` opacity-60`]}>Distance</Text>
-                <Text>{rideConfirmedDriver?.distance} km</Text>
-              </View>
-              <View style={[tw`flex-col gap-1`]}>
-                <Text style={[tw` opacity-60`]}>Time</Text>
-                <Text>{parseFloat(((distance / 30) * 60).toFixed(1))} min</Text>
-              </View>
-              <View style={[tw`flex-col gap-1`]}>
-                <Text style={[tw` opacity-60`]}>Price</Text>
-                <Text>Rs: {rideConfirmedDriver?.price}</Text>
-              </View>
-            </View>
-          </View>
+          <WaitingForDriver/>
         </View>
-
-        {/* //cancel button */}
-        <View style={[tw`w-100% px-5 mt-3 `]}>
-          <TouchableHighlight
-            onPress={showConfirmationPopup}
-            style={[tw`w-100% rounded-lg bg-black overflow-hidden`]}>
-            <Text
-              style={[
-                tw`text-lg  font-semibold  text-white py-3 text-center `,
-              ]}>
-              Cancel Request
-            </Text>
-          </TouchableHighlight>
-        </View>
-      </View>
+      )}
     </View>
   );
 }

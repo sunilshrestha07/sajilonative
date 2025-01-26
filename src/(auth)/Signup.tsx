@@ -52,7 +52,7 @@ export default function Signup({navigation}:any) {
         </View>
         <View style={[tw`py-5 gap-3`]}>
           <View>
-            <Text style={[tw`text-lg font-medium ${isDark ? "text-gray-300":"text-gray-700"}`,{fontFamily:'Quicksand-Bold'}]}>Name</Text>
+            <Text style={[tw`text-lg font-medium `,{fontFamily:'Quicksand-Bold'}]}>Name</Text>
             <TextInput
               placeholder="Userone"
               value={name}
@@ -61,7 +61,7 @@ export default function Signup({navigation}:any) {
             />
           </View>
           <View>
-            <Text style={[tw`text-lg font-medium ${isDark ? "text-gray-300":"text-gray-700"}`,{fontFamily:'Quicksand-Bold'}]}>Email</Text>
+            <Text style={[tw`text-lg font-medium `,{fontFamily:'Quicksand-Bold'}]}>Email</Text>
             <TextInput
               placeholder="userone@gmail.com"
               value={email}
@@ -70,7 +70,7 @@ export default function Signup({navigation}:any) {
             />
           </View>
           <View>
-            <Text style={[tw`text-lg font-medium ${isDark ? "text-gray-300":"text-gray-700"}`,{fontFamily:'Quicksand-Bold'}]}>Phone</Text>
+            <Text style={[tw`text-lg font-medium `,{fontFamily:'Quicksand-Bold'}]}>Phone</Text>
             <TextInput
               placeholder="9841849721"
               value={phone}
@@ -79,7 +79,7 @@ export default function Signup({navigation}:any) {
             />
           </View>
           <View>
-            <Text style={[tw`text-lg font-medium ${isDark ? "text-gray-300":"text-gray-700"}`,{fontFamily:'Quicksand-Bold'}]}>Password</Text>
+            <Text style={[tw`text-lg font-medium `,{fontFamily:'Quicksand-Bold'}]}>Password</Text>
             <TextInput
               secureTextEntry
               placeholder="*********"

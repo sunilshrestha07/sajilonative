@@ -9,13 +9,14 @@ import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import {logout} from '../../redux/userSlice';
-import {useIsFocused} from '@react-navigation/native';
 import {Image} from 'moti';
+import { useResetReduxState } from '../hooks/resetRudux';
+
 
 export default function CustomeDrawer(props: any) {
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const dispatch = useDispatch();
+  const resetReduxState = useResetReduxState();
 
   //handel logout confirm popup
   const handelLogoutConfirm = () => {
@@ -33,13 +34,19 @@ export default function CustomeDrawer(props: any) {
             text: 'Yes',
             onPress: () => {
               console.log('Logging out...');
-              dispatch(logout()); // Call the logout action
+              handelLogout()// Call the logout action
             },
           },
         ],
         {cancelable: false},
       );
-    }, 100); // Small delay to ensure UI is stable
+    }); // Small delay to ensure UI is stable
+  };
+
+  //handel logout
+  const handelLogout = async () => {
+    await resetReduxState();
+    dispatch({type: 'RESET'});
   };
 
   return (
