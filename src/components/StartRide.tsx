@@ -13,6 +13,7 @@ import {
   setendingLocation,
   setstartingLocation,
 } from '../../redux/locationSlice';
+import axios from 'axios';
 
 export default function StartRide() {
   const rideConfirmedUser = useSelector(
@@ -23,6 +24,7 @@ export default function StartRide() {
     (state: RootState) => state.socket.socketDriver,
   );
   const [isRideStarted, setIsRideStarted] = useState(false);
+  const currentUser=useSelector((state:RootState)=>state.user.currentUser)
 
   //useeffecf for socket
   useEffect(() => {
@@ -57,9 +59,28 @@ export default function StartRide() {
       driverdata,
       userId: rideConfirmedUser?.id,
     });
+    addrideToDb()
   };
 
-  //handel cancel end conformation
+  //handel data to post in db
+  const addrideToDb=async()=>{
+    const formdata={
+      pickuplocation:rideConfirmedUser?.pickuplocation,
+      droplocation:rideConfirmedUser?.droplocation,
+      userId:rideConfirmedUser?.id,
+      price:rideConfirmedUser?.price,
+      distance:rideConfirmedUser?.distance,
+      driverId:currentUser?._id
+    }
+    try {
+      const res = await axios.post(`https://sajiloride.vercel.app/api/rides`,formdata);
+      console.log('res',res.data.ride);
+    } catch (error) {
+      console.log('error',error);
+
+    }
+  }
+
   //conformation for cancelling the ride
   const showConfirmationPopup = () => {
     Alert.alert(
