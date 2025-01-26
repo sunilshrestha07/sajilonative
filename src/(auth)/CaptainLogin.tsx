@@ -112,6 +112,6 @@ const styles = StyleSheet.create({
     fontFamily: 'JimNightshade-Regular',
     fontSize: 45,
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: 40,
   },
 });

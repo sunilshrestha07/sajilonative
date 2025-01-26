@@ -69,6 +69,7 @@ const styles = StyleSheet.create({
   textstyle: {
     fontFamily: 'JimNightshade-Regular',
     fontSize: 45,
+    marginTop: 40,
   },
   rideViewBox: {
     width: '100%',

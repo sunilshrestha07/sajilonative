@@ -39,6 +39,8 @@ export default function StartRide() {
 
     return () => {
       socketDriver.off('rideHasBeenCancled');
+      socketDriver.off('rideCompleted');
+      socketDriver.off('rideStarted');
     };
   }, [socketDriver]);
 
@@ -63,20 +65,21 @@ export default function StartRide() {
   };
 
   //handel data to post in db
-  const addrideToDb=async()=>{
+  const addrideToDb= async () => {
     const formdata={
-      pickuplocation:rideConfirmedUser?.pickuplocation,
-      droplocation:rideConfirmedUser?.droplocation,
-      userId:rideConfirmedUser?.id,
       price:rideConfirmedUser?.price,
       distance:rideConfirmedUser?.distance,
-      driverId:currentUser?._id
+      driverId:currentUser?._id,
+      userId:rideConfirmedUser?.id,
+      droplocation:rideConfirmedUser?.droplocation.name,
+      pickuplocation:rideConfirmedUser?.pickuplocation.name
     }
     try {
       const res = await axios.post(`https://sajiloride.vercel.app/api/rides`,formdata);
       console.log('res',res.data.ride);
-    } catch (error) {
-      console.log('error',error);
+      console.log('addedto db');
+    } catch (error:any) {
+      console.log('error in adding',error.message);
 
     }
   }
