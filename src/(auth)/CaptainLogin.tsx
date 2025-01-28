@@ -16,6 +16,10 @@ export default function CaptainLogin({navigation}:any) {
   const dispatch = useDispatch()
 
   const handleSignup = async () => {
+    if (!email || !password) {
+      Alert.alert('All fields are required');
+      return
+    }
     try {
       setIsSubmitting(true);
       const formdata ={

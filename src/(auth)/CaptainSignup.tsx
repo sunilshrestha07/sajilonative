@@ -31,6 +31,10 @@ export default function CaptainSignup({navigation}: any) {
   const [isKeyBoardActive, setIsKeyBoardActive] = useState<boolean>(false);
 
   const handleSignup = async () => {
+    if (!email || !password || !phone || !name || !color || !plate) {
+      Alert.alert('All fields are required');
+      return
+    }
     try {
       setIsSubmitting(true);
       const formdata = {
@@ -100,9 +104,7 @@ export default function CaptainSignup({navigation}: any) {
 
         <View
           style={[
-            tw`flex-1 w-full h-full px-3 ${
-              isKeyBoardActive ? 'pb-10' : ' '
-            }`,
+            tw`flex-1 w-full h-full px-3 ${isKeyBoardActive ? 'pb-10' : ' '}`,
           ]}>
           <View>
             <Text
@@ -282,7 +284,7 @@ export default function CaptainSignup({navigation}: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 40
+    marginTop: 40,
   },
   textstyle: {
     fontFamily: 'JimNightshade-Regular',

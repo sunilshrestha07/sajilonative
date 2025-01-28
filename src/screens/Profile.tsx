@@ -264,7 +264,7 @@ export default function Profile() {
         {/* //save button */}
         <View style={[tw` w-full flex-row items-center justify-center `]}>
           <Pressable
-            disabled={isUpdating || isImageBeingUploaded}
+            disabled={isUpdating}
             onPress={updateProfile}
             style={[
               tw` w-6/12 py-3 rounded-lg flex-row items-center justify-center mt-10 `,

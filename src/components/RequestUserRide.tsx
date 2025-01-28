@@ -22,6 +22,7 @@ import {setIsRideBooked} from '../../redux/globalSlice';
 import {setdriversocket} from '../../redux/socketSlice';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import StartRide from './StartRide';
+import {driverLocation} from '../../redux/locationSlice';
 
 export default function RequestUserRide() {
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
@@ -100,7 +101,8 @@ export default function RequestUserRide() {
       avatar: currentUser?.avatar,
       location: {
         latitude: driverlocation?.lat || data.pickuplocation.latitude - 0.0015,
-        longitude: driverlocation?.lon || data.pickuplocation.longitude - 0.00099,
+        longitude:
+          driverlocation?.lon || data.pickuplocation.longitude - 0.00099,
       },
       vechicel: {
         color: currentUser?.vehicle.color,
@@ -110,6 +112,13 @@ export default function RequestUserRide() {
       price: data.price,
       distance: data.distance,
     };
+    dispatch(
+      driverLocation({
+        lat: data.pickuplocation.latitude - 0.0015,
+        lon: data.pickuplocation.longitude - 0.00099,
+      }),
+    );
+
     if (driverData.location.latitude && driverData.location.longitude) {
       socketRef.current.emit('requestRideToUser', {driverData, userId});
     } else {

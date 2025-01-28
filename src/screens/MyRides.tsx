@@ -1,4 +1,4 @@
-import {FlatList, StyleSheet, Text, View} from 'react-native';
+import {ActivityIndicator, FlatList, StyleSheet, Text, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import {useSelector} from 'react-redux';
@@ -21,14 +21,18 @@ interface ridesInterface {
 export default function MyRides() {
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const [allRides, setAllRides] = useState<ridesInterface[]>([]);
+  const [isFetching, setIsFetching] = useState(false);
   const fetchRides = async () => {
+    setIsFetching(true);
     try {
       const res = await axios.get(
-        `https://sajiloride.vercel.app/api/rides/677cf6500669ec84f3796ee7`,
+        `https://sajiloride.vercel.app/api/rides/${currentUser?._id}`,
       );
       setAllRides(res.data.rides);
+      setIsFetching(false)
     } catch (error) {
       console.log(error);
+      setIsFetching(false)
     }
   };
 
@@ -40,6 +44,12 @@ export default function MyRides() {
       <View>
         {allRides.length > 0 ? (
           <View>
+            {isFetching &&
+            <ActivityIndicator
+              size="large"
+              color="black"
+            />
+            }
             <FlatList
               data={allRides}
               showsVerticalScrollIndicator={false}

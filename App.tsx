@@ -18,17 +18,17 @@ export default function App() {
     // Animate the circle to expand to full screen
     Animated.timing(scaleAnim, {
       toValue: 50,  // Expand the circle to the screen size (adjust this value)
-      duration: 500,  // Animation duration (1 second)
+      duration: 1500,  // Animation duration (1 second)
       easing: Easing.ease,  // Easing function for smooth animation
       useNativeDriver: false,
     }).start();
 
     // Fade out the logo during the animation
-    // Animated.timing(opacityAnim, {
-    //   toValue: 0,  // Fade out
-    //   duration: 50,  // Fade out duration
-    //   useNativeDriver: true,
-    // }).start();
+    Animated.timing(opacityAnim, {
+      toValue: 0,  // Fade out
+      duration: 500,  // Fade out duration
+      useNativeDriver: true,
+    }).start();
   }, []);
   return (
     <Provider store={store}>
